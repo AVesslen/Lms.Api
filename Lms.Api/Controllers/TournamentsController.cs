@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Lms.Data.Data;
 using Lms.Core.Entities;
+using Lms.Data.Repositories;
+using Lms.Core.Repositories;
 
 namespace Lms.Api.Controllers
 {
@@ -14,44 +16,106 @@ namespace Lms.Api.Controllers
     [ApiController]
     public class TournamentsController : ControllerBase
     {
-        private readonly LmsApiContext _context;
+       // private readonly LmsApiContext _context;
+        private readonly IUnitOfWork uow;
 
-        public TournamentsController(LmsApiContext context)
+        public TournamentsController(IUnitOfWork uow)
         {
-            _context = context;
+            // _context = context;
+            this.uow = uow;
         }
+
+
+
+        //// GET: api/Tournaments
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<Tournament>>> GetTournament()
+        //{
+        //  if (_context.Tournament == null)
+        //  {
+        //      return NotFound();
+        //  }
+        //    return await _context.Tournament.ToListAsync();
+        //}
 
         // GET: api/Tournaments
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Tournament>>> GetTournament()
         {
-          if (_context.Tournament == null)
-          {
-              return NotFound();
-          }
-            return await _context.Tournament.ToListAsync();
+            //if (_context.Tournament == null)
+            //{
+            //    return NotFound();
+            //}
+            var tournaments = await uow.TournamentRepository.GetAllAsync();
+            return tournaments.ToList();
         }
+
+        //// GET: api/Tournaments/5
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<Tournament>> GetTournament(int id)
+        //{
+        //  if (_context.Tournament == null)
+        //  {
+        //      return NotFound();
+        //  }
+        //    var tournament = await _context.Tournament.FindAsync(id);
+
+        //    if (tournament == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return tournament;
+        //}
+
 
         // GET: api/Tournaments/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Tournament>> GetTournament(int id)
-        {
-          if (_context.Tournament == null)
-          {
-              return NotFound();
-          }
-            var tournament = await _context.Tournament.FindAsync(id);
+        {          
+            var tournament = await uow.TournamentRepository.GetAsync(id);   
 
             if (tournament == null)
             {
                 return NotFound();
             }
 
-            return tournament;
+            return tournament;            
         }
 
-        // PUT: api/Tournaments/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
+        //// PUT: api/Tournaments/5       
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutTournament(int id, Tournament tournament)
+        //{
+        //    if (id != tournament.Id)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    _context.Entry(tournament).State = EntityState.Modified;
+
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!TournamentExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return NoContent();
+        //}
+
+
+        // PUT: api/Tournaments/5       
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTournament(int id, Tournament tournament)
         {
@@ -60,18 +124,19 @@ namespace Lms.Api.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(tournament).State = EntityState.Modified;
+           // _context.Entry(tournament).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                 uow.TournamentRepository.Update(tournament); 
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TournamentExists(id))
+                if (await uow.TournamentRepository.AnyAsync(id) == false)
                 {
                     return NotFound();
                 }
+            
                 else
                 {
                     throw;
@@ -81,44 +146,76 @@ namespace Lms.Api.Controllers
             return NoContent();
         }
 
-        // POST: api/Tournaments
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
+
+
+        //// POST: api/Tournaments
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPost]
+        //public async Task<ActionResult<Tournament>> PostTournament(Tournament tournament)
+        //{
+        //  if (_context.Tournament == null)
+        //  {
+        //      return Problem("Entity set 'LmsApiContext.Tournament'  is null.");
+        //  }
+        //    _context.Tournament.Add(tournament);
+        //    await _context.SaveChangesAsync();
+
+        //    return CreatedAtAction("GetTournament", new { id = tournament.Id }, tournament);
+        //}
+
+        // POST: api/Tournaments    
         [HttpPost]
         public async Task<ActionResult<Tournament>> PostTournament(Tournament tournament)
         {
-          if (_context.Tournament == null)
-          {
-              return Problem("Entity set 'LmsApiContext.Tournament'  is null.");
-          }
-            _context.Tournament.Add(tournament);
-            await _context.SaveChangesAsync();
+        
+            uow.TournamentRepository.Add(tournament);           
 
             return CreatedAtAction("GetTournament", new { id = tournament.Id }, tournament);
         }
+
+
+
+        //// DELETE: api/Tournaments/5
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteTournament(int id)
+        //{
+        //    if (_context.Tournament == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    var tournament = await _context.Tournament.FindAsync(id);
+        //    if (tournament == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    _context.Tournament.Remove(tournament);
+        //    await _context.SaveChangesAsync();
+
+        //    return NoContent();
+        //}
 
         // DELETE: api/Tournaments/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTournament(int id)
         {
-            if (_context.Tournament == null)
-            {
-                return NotFound();
-            }
-            var tournament = await _context.Tournament.FindAsync(id);
+            
+            var tournament = await uow.TournamentRepository.GetAsync(id);
             if (tournament == null)
             {
                 return NotFound();
             }
 
-            _context.Tournament.Remove(tournament);
-            await _context.SaveChangesAsync();
+            uow.TournamentRepository.Remove(tournament);
+            
 
             return NoContent();
         }
 
-        private bool TournamentExists(int id)
-        {
-            return (_context.Tournament?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+        //private bool TournamentExists(int id)
+        //{
+        //    return (_context.Tournament?.Any(e => e.Id == id)).GetValueOrDefault();
+        //}
     }
 }

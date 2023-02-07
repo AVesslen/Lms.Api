@@ -20,12 +20,10 @@ namespace Lms.Data.Repositories
                 this.db = db;
             }
 
-
             public async Task<IEnumerable<Game>> GetAllAsync()
             {
-                return await db.Game.ToListAsync();
+            return await db.Game.ToListAsync();
             }
-
 
             public async Task<Game> GetAsync(int id)
             {
@@ -54,9 +52,10 @@ namespace Lms.Data.Repositories
                 if (game is null)
                 {
                     throw new ArgumentNullException(nameof(game));
-                }
+            }
 
-                db.SaveChangesAsync();
+            db.Entry(game).State = EntityState.Modified;
+            db.SaveChangesAsync();
             }
 
             public void Remove(Game game)

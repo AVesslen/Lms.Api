@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Bogus.DataSets;
 using Lms.Core.Entities;
 using Lms.Core.Repositories;
 using Lms.Data.Data;
@@ -27,10 +28,11 @@ namespace Lms.Data.Repositories
         }
 
 
-        public async Task<Tournament> GetAsync(int id)
+        public async Task<Tournament?> GetAsync(int id)
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
-            return await db.Tournament.FirstOrDefaultAsync(t => t.Id == id);
+           
+            return await db.Tournament.FindAsync(id);
         }
         
 
@@ -46,7 +48,8 @@ namespace Lms.Data.Repositories
                 throw new ArgumentNullException(nameof(tournament));
             }
 
-            db.AddAsync(tournament);
+            db.Tournament.Add(tournament);
+            db.SaveChanges();
         }
 
         public void Update(Tournament tournament)
@@ -56,7 +59,8 @@ namespace Lms.Data.Repositories
                 throw new ArgumentNullException(nameof(tournament));
             }
 
-            db.SaveChangesAsync();
+            db.Entry(tournament).State = EntityState.Modified;
+            db.SaveChanges();
         }
 
         public void Remove(Tournament tournament)
@@ -67,6 +71,7 @@ namespace Lms.Data.Repositories
             }
 
             db.Tournament.Remove(tournament);
+            db.SaveChanges();
         }
     }
 }
