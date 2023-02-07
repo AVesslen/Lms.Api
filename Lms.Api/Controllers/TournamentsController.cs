@@ -9,6 +9,7 @@ using Lms.Data.Data;
 using Lms.Core.Entities;
 using Lms.Data.Repositories;
 using Lms.Core.Repositories;
+using AutoMapper;
 
 namespace Lms.Api.Controllers
 {
@@ -18,11 +19,13 @@ namespace Lms.Api.Controllers
     {
        // private readonly LmsApiContext _context;
         private readonly IUnitOfWork uow;
+        private readonly IMapper mapper;
 
-        public TournamentsController(IUnitOfWork uow)
+        public TournamentsController(IUnitOfWork uow, IMapper mapper)
         {
             // _context = context;
             this.uow = uow;
+            this.mapper = mapper;
         }
 
 

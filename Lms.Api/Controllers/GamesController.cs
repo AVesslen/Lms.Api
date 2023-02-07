@@ -9,6 +9,7 @@ using Lms.Data.Data;
 using Lms.Core.Entities;
 using Lms.Data.Repositories;
 using Lms.Core.Repositories;
+using AutoMapper;
 
 namespace Lms.Api.Controllers
 {
@@ -18,10 +19,12 @@ namespace Lms.Api.Controllers
     {
         //private readonly LmsApiContext _context;
         private readonly IUnitOfWork uow;
+        private readonly IMapper mapper;
 
-        public GamesController(IUnitOfWork uow)
+        public GamesController(IUnitOfWork uow, IMapper mapper)
         {
             this.uow = uow;
+            this.mapper = mapper;
         }
 
         //// GET: api/Games
@@ -101,21 +104,10 @@ namespace Lms.Api.Controllers
                 return BadRequest();
             }                      
 
-            try
-            {
-                uow.GameRepository.Update(game);
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!GameExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+          
+            uow.GameRepository.Update(game);
+            
+          
 
             return NoContent();
         }
