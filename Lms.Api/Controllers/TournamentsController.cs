@@ -10,6 +10,7 @@ using Lms.Core.Entities;
 using Lms.Data.Repositories;
 using Lms.Core.Repositories;
 using AutoMapper;
+using Lms.Core.Dto;
 
 namespace Lms.Api.Controllers
 {
@@ -43,14 +44,15 @@ namespace Lms.Api.Controllers
 
         // GET: api/Tournaments
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Tournament>>> GetTournament()
-        {
-            //if (_context.Tournament == null)
-            //{
-            //    return NotFound();
-            //}
+        public async Task<ActionResult<IEnumerable<TournamentDto>>> GetTournament()
+        {           
             var tournaments = await uow.TournamentRepository.GetAllAsync();
-            return tournaments.ToList();
+            
+            if(tournaments == null) return NotFound();
+
+            var tournamentDto = mapper.Map<IEnumerable<TournamentDto>>(tournaments);
+
+            return Ok(tournamentDto);
         }
 
         //// GET: api/Tournaments/5
@@ -74,16 +76,15 @@ namespace Lms.Api.Controllers
 
         // GET: api/Tournaments/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Tournament>> GetTournament(int id)
+        public async Task<ActionResult<TournamentDto>> GetTournament(int id)
         {          
             var tournament = await uow.TournamentRepository.GetAsync(id);   
 
-            if (tournament == null)
-            {
-                return NotFound();
-            }
+            if (tournament == null) return NotFound();
 
-            return tournament;            
+            var tournamentDto = mapper.Map<TournamentDto>(tournament);
+
+            return Ok(tournamentDto);            
         }
 
 
@@ -120,15 +121,13 @@ namespace Lms.Api.Controllers
 
         // PUT: api/Tournaments/5       
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTournament(int id, Tournament tournament)
+        public async Task<ActionResult<TournamentDto>> PutTournament(int id, TournamentDto tournamentDto)
         {
-            if (id != tournament.Id)
-            {
-                return BadRequest();
-            }
+            var tournament = await uow.TournamentRepository.GetAsync(id);
 
-           // _context.Entry(tournament).State = EntityState.Modified;
+            if (tournament == null) return NotFound();
 
+            mapper.Map(tournamentDto, tournament);
             try
             {
                  uow.TournamentRepository.Update(tournament); 
@@ -145,10 +144,8 @@ namespace Lms.Api.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
-        }
-
+            return Ok(mapper.Map<TournamentDto>(tournament));
+           }
 
 
 
@@ -169,12 +166,34 @@ namespace Lms.Api.Controllers
 
         // POST: api/Tournaments    
         [HttpPost]
-        public async Task<ActionResult<Tournament>> PostTournament(Tournament tournament)
+        public async Task<ActionResult<TournamentDto>> PostTournament(CreateTournamentDto dto)
         {
         
-            uow.TournamentRepository.Add(tournament);           
+            //uow.TournamentRepository.Add(tournament);           
 
-            return CreatedAtAction("GetTournament", new { id = tournament.Id }, tournament);
+            //return CreatedAtAction("GetTournament", new { id = tournament.Id }, tournament);
+
+            var tournament = mapper.Map<Tournament>(dto);
+            uow.TournamentRepository.Add(tournament);
+            await uow.CompleteAsync();
+            return CreatedAtAction(nameof(GetTournament), new {title = tournament.Title}, mapper.Map<TournamentDto>(dto));
+
+
+
+
+
+            //if (await uow.CodeEventRepository.GetAsync(dto.Name) != null)
+            //{
+            //    ModelState.AddModelError("Name", "Name exists");
+            //    return BadRequest(ModelState);
+            //}
+
+            //var codeEvent = mapper.Map<CodeEvent>(dto);
+            //await uow.CodeEventRepository.AddAsync(codeEvent);
+            //await uow.CompleteAsync();
+
+            //return CreatedAtAction(nameof(GetCodeEvent), new { name = codeEvent.Name }, mapper.Map<CodeEventDto>(dto));
+
         }
 
 

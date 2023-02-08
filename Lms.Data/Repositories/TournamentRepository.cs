@@ -48,8 +48,7 @@ namespace Lms.Data.Repositories
                 throw new ArgumentNullException(nameof(tournament));
             }
 
-            db.Tournament.Add(tournament);
-            db.SaveChanges();
+            db.Tournament.Add(tournament);           
         }
 
         public void Update(Tournament tournament)
