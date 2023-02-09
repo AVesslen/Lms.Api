@@ -14,7 +14,8 @@ using Lms.Core.Dto;
 
 namespace Lms.Api.Controllers
 {
-    [Route("api/[controller]")]
+    //[Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class TournamentsController : ControllerBase
     {
@@ -138,7 +139,7 @@ namespace Lms.Api.Controllers
                 {
                     return NotFound();
                 }
-            
+
                 else
                 {
                     throw;
@@ -149,8 +150,7 @@ namespace Lms.Api.Controllers
 
 
 
-        //// POST: api/Tournaments
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //// POST: api/Tournaments      
         //[HttpPost]
         //public async Task<ActionResult<Tournament>> PostTournament(Tournament tournament)
         //{
@@ -177,25 +177,8 @@ namespace Lms.Api.Controllers
             uow.TournamentRepository.Add(tournament);
             await uow.CompleteAsync();
             return CreatedAtAction(nameof(GetTournament), new {title = tournament.Title}, mapper.Map<TournamentDto>(dto));
-
-
-
-
-
-            //if (await uow.CodeEventRepository.GetAsync(dto.Name) != null)
-            //{
-            //    ModelState.AddModelError("Name", "Name exists");
-            //    return BadRequest(ModelState);
-            //}
-
-            //var codeEvent = mapper.Map<CodeEvent>(dto);
-            //await uow.CodeEventRepository.AddAsync(codeEvent);
-            //await uow.CompleteAsync();
-
-            //return CreatedAtAction(nameof(GetCodeEvent), new { name = codeEvent.Name }, mapper.Map<CodeEventDto>(dto));
-
+                      
         }
-
 
 
         //// DELETE: api/Tournaments/5

@@ -10,11 +10,13 @@ using Lms.Core.Entities;
 using Lms.Data.Repositories;
 using Lms.Core.Repositories;
 using AutoMapper;
+using Lms.Core.Dto;
 
 namespace Lms.Api.Controllers
 {
-    [Route("api/[controller]")]
+    //[Route("api/[controller]")]
     [ApiController]
+    [Route("[controller]")]
     public class GamesController : ControllerBase
     {
         //private readonly LmsApiContext _context;
@@ -40,26 +42,30 @@ namespace Lms.Api.Controllers
 
         // GET: api/Games
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Game>>> GetGame()
+        public async Task<ActionResult<IEnumerable<GameDto>>> GetGame()
         {
             var games = await uow.GameRepository.GetAllAsync();
-            return games.ToList();
+            
+            if (games == null) return NotFound();
+
+            var gameDto = mapper.Map<GameDto>(games);
+
+            return Ok(gameDto);
            
         }
 
         // GET: api/Games/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Game>> GetGame(int id)
+        public async Task<ActionResult<GameDto>> GetGame(int id)
         {
           
             var game = await uow.GameRepository.GetAsync(id);
 
-            if (game == null)
-            {
-                return NotFound();
-            }
+            if (game == null) return NotFound();
 
-            return game;
+            var gameDto = mapper.Map<GameDto>(game);
+
+            return Ok(gameDto);
         }
 
         //// PUT: api/Games/5
@@ -97,19 +103,35 @@ namespace Lms.Api.Controllers
 
         // PUT: api/Games/5        
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutGame(int id, Game game)
+        public async Task<ActionResult<GameDto>> PutGame(int id, GameDto gameDto)
         {
-            if (id != game.Id)
-            {
-                return BadRequest();
-            }                      
 
-          
-            uow.GameRepository.Update(game);
+            var game = await uow.GameRepository.GetAsync(id);
+
+            if (game == null) return NotFound();
+
+            mapper.Map(gameDto,game);
+
+            try
+            {
+              uow.GameRepository.Update(game);
+              
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (await uow.GameRepository.AnyAsync(id) == false)
+                {
+                    return NotFound();
+                }
+
+                else
+                throw;
+            }
+            await uow.CompleteAsync();
             
           
 
-            return NoContent();
+            return Ok(mapper.Map<GameDto>(game));
         }
 
 
@@ -132,12 +154,13 @@ namespace Lms.Api.Controllers
 
         // POST: api/Games       
         [HttpPost]
-        public async Task<ActionResult<Game>> PostGame(Game game)
+        public async Task<ActionResult<GameDto>> PostGame(CreateGameDto dto)
         {
-            
-            uow.GameRepository.Add(game);            
+            var game = mapper.Map<Game>(dto);
+            uow.GameRepository.Add(game);    
+            await uow.CompleteAsync();
 
-            return CreatedAtAction("GetGame", new { id = game.Id }, game);
+            return CreatedAtAction(nameof(GetGame), new { title = game.Title }, mapper.Map<GameDto>(dto));
         }
 
 
