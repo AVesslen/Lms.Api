@@ -79,6 +79,7 @@ namespace Lms.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TournamentDto>> GetTournament(int id)
         {          
+            
             var tournament = await uow.TournamentRepository.GetAsync(id);   
 
             if (tournament == null) return NotFound();

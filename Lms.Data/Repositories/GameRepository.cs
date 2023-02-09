@@ -44,7 +44,7 @@ namespace Lms.Data.Repositories
                     throw new ArgumentNullException(nameof(game));
                 }
 
-                db.AddAsync(game);
+                db.Add(game);
             }
 
             public void Update(Game game)
@@ -52,10 +52,10 @@ namespace Lms.Data.Repositories
                 if (game is null)
                 {
                     throw new ArgumentNullException(nameof(game));
-            }
+                }
 
-            db.Entry(game).State = EntityState.Modified;
-            db.SaveChangesAsync();
+                db.Entry(game).State = EntityState.Modified;
+       
             }
 
             public void Remove(Game game)

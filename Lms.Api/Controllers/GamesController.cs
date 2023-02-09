@@ -16,7 +16,7 @@ namespace Lms.Api.Controllers
 {
     //[Route("api/[controller]")]
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/tournaments")]
     public class GamesController : ControllerBase
     {
         //private readonly LmsApiContext _context;
@@ -48,7 +48,7 @@ namespace Lms.Api.Controllers
             
             if (games == null) return NotFound();
 
-            var gameDto = mapper.Map<GameDto>(games);
+            var gameDto = mapper.Map<IEnumerable<GameDto>>(games);
 
             return Ok(gameDto);
            
