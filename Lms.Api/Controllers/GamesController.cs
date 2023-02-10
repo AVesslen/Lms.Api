@@ -56,15 +56,17 @@ namespace Lms.Api.Controllers
         }
 
         // GET: api/Games/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<GameDto>> GetGame(int id)
+        [HttpGet("{name}")]
+        public async Task<ActionResult<GameDto>> GetGame(string name)
         {
-          
-            var game = await uow.GameRepository.GetAsync(id);
+            if (string.IsNullOrWhiteSpace(name)) return BadRequest();
+
+
+            var game = await uow.GameRepository.GetAsync(name);
 
             if (game == null) return NotFound();
 
-            var gameDto = mapper.Map<GameDto>(game);
+            var gameDto = mapper.Map<IEnumerable<GameDto>>(game);
 
             return Ok(gameDto);
         }

@@ -25,14 +25,25 @@ namespace Lms.Data.Repositories
             return await db.Game.ToListAsync();
             }
 
-            public async Task<Game> GetAsync(int id)
+            public async Task<IEnumerable<Game>> GetAsync(string name)
             {
-                ArgumentNullException.ThrowIfNull(id, nameof(id));
-                return await db.Game.FirstOrDefaultAsync(g => g.Id == id);
+                if (string.IsNullOrEmpty(name)) 
+                { 
+                throw new ArgumentNullException($"{nameof(name)} can't be null or whitespace.", nameof(name)); 
+                }
+
+                return await db.Game.Where(g => g.Title == name).ToListAsync();
             }
 
+            public async Task<Game> GetAsync(int id)
+            {
+              ArgumentNullException.ThrowIfNull(id, nameof(id));
 
-            public async Task<bool> AnyAsync(int id)
+              return await db.Game.FirstOrDefaultAsync(g => g.Id == id);
+        }
+
+
+        public async Task<bool> AnyAsync(int id)
             {
                 return await (db.Game.AnyAsync(g => g.Id == id));
             }
