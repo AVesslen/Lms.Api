@@ -11,12 +11,13 @@ using Lms.Data.Repositories;
 using Lms.Core.Repositories;
 using AutoMapper;
 using Lms.Core.Dto;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace Lms.Api.Controllers
 {
     //[Route("api/[controller]")]
     [ApiController]
-    [Route("api/tournaments")]
+    [Route("api/games")]
     public class GamesController : ControllerBase
     {
         //private readonly LmsApiContext _context;
@@ -114,8 +115,7 @@ namespace Lms.Api.Controllers
 
             try
             {
-              uow.GameRepository.Update(game);
-              
+              uow.GameRepository.Update(game);              
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -127,9 +127,28 @@ namespace Lms.Api.Controllers
                 else
                 throw;
             }
-            await uow.CompleteAsync();
+            await uow.CompleteAsync();   
             
-          
+            return Ok(mapper.Map<GameDto>(game));
+        }
+
+
+
+        [HttpPatch("{id}")]
+        public async Task<ActionResult<GameDto>> PatchGame(int id,
+          JsonPatchDocument<GameDto> patchDocument)
+        {
+            var game = await uow.GameRepository.GetAsync(id);
+            if (game == null) return NotFound();
+
+            var dto = mapper.Map<GameDto>(game);
+
+            patchDocument.ApplyTo(dto, ModelState);
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            mapper.Map(dto, game);
+            await uow.CompleteAsync();
 
             return Ok(mapper.Map<GameDto>(game));
         }

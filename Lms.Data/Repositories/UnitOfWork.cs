@@ -26,7 +26,7 @@ namespace Lms.Data.Repositories
 
         public async Task CompleteAsync()
         {
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync();            
         }
     }
 }

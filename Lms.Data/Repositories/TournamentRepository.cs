@@ -22,9 +22,12 @@ namespace Lms.Data.Repositories
         }
 
 
-        public async Task<IEnumerable<Tournament>> GetAllAsync()
+        public async Task<IEnumerable<Tournament>> GetAllAsync(bool includeGames = false)
         {
-            return await db.Tournament.ToListAsync();
+           
+            return includeGames ? await db.Tournament.Include(t => t.Games)
+                                                     .ToListAsync():
+                                  await db.Tournament.ToListAsync();
         }
 
 

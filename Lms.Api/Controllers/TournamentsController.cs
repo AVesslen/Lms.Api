@@ -11,6 +11,8 @@ using Lms.Data.Repositories;
 using Lms.Core.Repositories;
 using AutoMapper;
 using Lms.Core.Dto;
+using Azure;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace Lms.Api.Controllers
 {
@@ -43,13 +45,27 @@ namespace Lms.Api.Controllers
         //    return await _context.Tournament.ToListAsync();
         //}
 
+        //// GET: api/Tournaments
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<TournamentDto>>> GetTournament()
+        //{           
+        //    var tournaments = await uow.TournamentRepository.GetAllAsync();
+            
+        //    if(tournaments == null) return NotFound();
+
+        //    var tournamentDto = mapper.Map<IEnumerable<TournamentDto>>(tournaments);
+
+        //    return Ok(tournamentDto);
+        //}
+
+
         // GET: api/Tournaments
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TournamentDto>>> GetTournament()
-        {           
-            var tournaments = await uow.TournamentRepository.GetAllAsync();
-            
-            if(tournaments == null) return NotFound();
+        public async Task<ActionResult<IEnumerable<TournamentDto>>> GetTournament(bool includeGames = false)
+        {
+            var tournaments = await uow.TournamentRepository.GetAllAsync(includeGames);
+
+            if (tournaments == null) return NotFound();
 
             var tournamentDto = mapper.Map<IEnumerable<TournamentDto>>(tournaments);
 
@@ -151,6 +167,28 @@ namespace Lms.Api.Controllers
 
 
 
+        [HttpPatch("{tournamentId}")]
+        public async Task<ActionResult<TournamentDto>> PatchTournament(int tournamentId,
+            JsonPatchDocument<TournamentDto> patchDocument)
+        {
+            var tournament = await uow.TournamentRepository.GetAsync(tournamentId);
+            if (tournament == null) return NotFound();
+
+            var dto = mapper.Map<TournamentDto>(tournament);
+
+            patchDocument.ApplyTo(dto, ModelState);
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            mapper.Map(dto, tournament);
+            await uow.CompleteAsync();
+
+            return Ok(mapper.Map<TournamentDto>(tournament));        
+        }
+
+
+
+
         //// POST: api/Tournaments      
         //[HttpPost]
         //public async Task<ActionResult<Tournament>> PostTournament(Tournament tournament)
@@ -169,16 +207,11 @@ namespace Lms.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<TournamentDto>> PostTournament(CreateTournamentDto dto)
         {
-        
-            //uow.TournamentRepository.Add(tournament);           
-
-            //return CreatedAtAction("GetTournament", new { id = tournament.Id }, tournament);
-
             var tournament = mapper.Map<Tournament>(dto);
             uow.TournamentRepository.Add(tournament);
             await uow.CompleteAsync();
-            return CreatedAtAction(nameof(GetTournament), new {title = tournament.Title}, mapper.Map<TournamentDto>(dto));
-                      
+            
+            return CreatedAtAction(nameof(GetTournament), new {title = tournament.Title}, mapper.Map<TournamentDto>(dto));         
         }
 
 

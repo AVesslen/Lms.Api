@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Lms.Core.Dto
 {
+#nullable disable
     public class TournamentDto
     {
         public string Title { get; set; } = string.Empty;
@@ -14,6 +15,7 @@ namespace Lms.Core.Dto
 
         public DateTime EndDate => StartDate.AddMonths(3);
 
+        public ICollection<GameDto> Games { get; set; }
 
 
 
