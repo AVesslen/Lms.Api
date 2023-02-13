@@ -40,7 +40,7 @@ namespace Lms.Data.Repositories
               ArgumentNullException.ThrowIfNull(id, nameof(id));
 
               return await db.Game.FirstOrDefaultAsync(g => g.Id == id);
-        }
+            }
 
 
         public async Task<bool> AnyAsync(int id)

@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Lms.Core.Dto
 {
+    /// <summary>
+    /// A dto for creating a new Tournament
+    /// </summary>
     public class CreateTournamentDto
     {
         [Required(ErrorMessage = "Tournaments need titles")]

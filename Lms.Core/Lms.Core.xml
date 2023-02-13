@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Lms.Core</name>
+    </assembly>
+    <members>
+        <member name="T:Lms.Core.Dto.CreateTournamentDto">
+            <summary>
+            A dto for creating a new Tournament
+            </summary>
+        </member>
+        <member name="T:Lms.Core.Dto.TournamentDto">
+            <summary>
+            A tournament with title, start date, end time and games
+            </summary>
+        </member>
+        <member name="P:Lms.Core.Dto.TournamentDto.Title">
+            <summary>
+            Title of the tournament
+            </summary>
+        </member>
+    </members>
+</doc>

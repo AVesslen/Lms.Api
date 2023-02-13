@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Lms.Api</name>
+    </assembly>
+    <members>
+        <member name="M:Lms.Api.Controllers.TournamentsController.GetTournament(System.Boolean)">
+            <summary>
+            Get all tournaments
+            </summary>
+            <param name="includeGames">Set to true to include games for each tournament</param>
+            <returns>Title, start date, end date, games</returns>
+        </member>
+    </members>
+</doc>

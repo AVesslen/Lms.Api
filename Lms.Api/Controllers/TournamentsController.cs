@@ -19,6 +19,8 @@ namespace Lms.Api.Controllers
     //[Route("api/[controller]")]
     [Route("[controller]")]
     [ApiController]
+    [Produces("application/json", "application/xml")]
+    //[ProducesResponseType(StatusCodes.Status406NotAcceptable)]
     public class TournamentsController : ControllerBase
     {
        // private readonly LmsApiContext _context;
@@ -34,33 +36,16 @@ namespace Lms.Api.Controllers
 
 
 
-        //// GET: api/Tournaments
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<Tournament>>> GetTournament()
-        //{
-        //  if (_context.Tournament == null)
-        //  {
-        //      return NotFound();
-        //  }
-        //    return await _context.Tournament.ToListAsync();
-        //}
-
-        //// GET: api/Tournaments
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<TournamentDto>>> GetTournament()
-        //{           
-        //    var tournaments = await uow.TournamentRepository.GetAllAsync();
-            
-        //    if(tournaments == null) return NotFound();
-
-        //    var tournamentDto = mapper.Map<IEnumerable<TournamentDto>>(tournaments);
-
-        //    return Ok(tournamentDto);
-        //}
-
+        /// <summary>
+        /// Get all tournaments
+        /// </summary>
+        /// <param name="includeGames">Set to true to include games for each tournament</param>
+        /// <returns>Title, start date, end date, games</returns>
 
         // GET: api/Tournaments
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<TournamentDto>>> GetTournament(bool includeGames = false)
         {
             var tournaments = await uow.TournamentRepository.GetAllAsync(includeGames);
@@ -72,23 +57,6 @@ namespace Lms.Api.Controllers
             return Ok(tournamentDto);
         }
 
-        //// GET: api/Tournaments/5
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<Tournament>> GetTournament(int id)
-        //{
-        //  if (_context.Tournament == null)
-        //  {
-        //      return NotFound();
-        //  }
-        //    var tournament = await _context.Tournament.FindAsync(id);
-
-        //    if (tournament == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return tournament;
-        //}
 
 
         // GET: api/Tournaments/5
@@ -187,24 +155,11 @@ namespace Lms.Api.Controllers
         }
 
 
-
-
-        //// POST: api/Tournaments      
-        //[HttpPost]
-        //public async Task<ActionResult<Tournament>> PostTournament(Tournament tournament)
-        //{
-        //  if (_context.Tournament == null)
-        //  {
-        //      return Problem("Entity set 'LmsApiContext.Tournament'  is null.");
-        //  }
-        //    _context.Tournament.Add(tournament);
-        //    await _context.SaveChangesAsync();
-
-        //    return CreatedAtAction("GetTournament", new { id = tournament.Id }, tournament);
-        //}
+    
 
         // POST: api/Tournaments    
         [HttpPost]
+        [Consumes("application/json", "application/xml")]
         public async Task<ActionResult<TournamentDto>> PostTournament(CreateTournamentDto dto)
         {
             var tournament = mapper.Map<Tournament>(dto);
